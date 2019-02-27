@@ -33,7 +33,8 @@ After this step you should have a functional build
 
 ## Modify the CRD to add your properties
 
-Find the line:
+Edit the file `pkg/apis/app/v1alpha1/appgiphy_types.go`
+Find the lines:
 ```go
 type AppGiphySpec struct {
   // INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -53,6 +54,82 @@ operator-sdk generate k8s
 
 ## Modify the controller to adapt Pod creation
 
-TODO
+Edit the file `pkg/controller/appgiphy/appgiphy_controller.go`
+Find the lines:
+```go
+			Containers: []corev1.Container{
+				{
+					Name:    "busybox",
+					Image:   "busybox",
+					Command: []string{"sleep", "3600"},
+				},
+			},
+```
 
+- Replace the `busybox` name with `giphyserver`
+- Replace the `busybox` image with `pyaillet/giphyserver:0.1`
+- Remove the `Command` section
 
+The content should then, be like:
+```go
+			Containers: []corev1.Container{
+				{
+					Name:    "giphyserver",
+					Image:   "pyaillet/giphyserver:0.1",
+				},
+			},
+```
+
+## Rebuild and push the operator
+
+```shell
+operator-sdk build pyaillet/giphy-operator:0.1
+docker push pyaillet/giphy-operator:0.1
+```
+
+## Deployment
+
+- Replace the image name in the deployment descriptor `deploy/operator.yaml`
+  with your image:
+
+```yaml
+containers:
+  - name: giphy-operator
+    # Replace this with the built image name
+    image: pyaillet/giphy-operator:0.1
+```
+
+- Deploy the _Operator_ and other needed resources
+
+```shell
+kubectl apply -f deploy/crds/app_v1alpha1_appgiphy_crd.yaml
+kubectl apply -f deploy/
+```
+
+- Verify that the _CRD_ has been created
+
+```shell
+$ kubectl get crd
+NAME                        CREATED AT
+appgiphies.app.zenika.com   2019-02-27T22:23:02Z
+```
+
+- Create a new Custom Resource
+
+```shell
+kubectl apply -f - <<EOF
+apiVersion: app.zenika.com/v1alpha1
+kind: AppGiphy
+metadata:
+  name: example-appgiphy
+spec:
+  tag: dog
+```
+
+- Verify that a new _Pod_ corresponding to your CR is being created:
+
+```shell
+$ kubectl get po -l app=example-appgiphy
+NAME                   READY     STATUS    RESTARTS   AGE
+example-appgiphy-pod   1/1       Running   0          100s
+```

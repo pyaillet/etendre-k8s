@@ -23,7 +23,7 @@ operator-sdk add api --api-version=app.zenika.com/v1alpha1 --kind=AppGiphy
 # Add a new controller that watches for AppGiphy
 operator-sdk add controller --api-version=app.zenika.com/v1alpha1 --kind=AppGiphy
 
-# Build and push the app-operator image to a public registry such as quay.io
+# Build and push the app-operator image to a public registry
 operator-sdk build pyaillet/giphy-operator
 ```
 
@@ -33,7 +33,23 @@ After this step you should have a functional build
 
 ## Modify the CRD to add your properties
 
-TODO
+Find the line:
+```go
+type AppGiphySpec struct {
+  // INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+```
+
+Insert this line after the previous ones to specify the tag used for this
+particular AppGiphy:
+```go
+  Tag string
+```
+
+As stated in the code comment, launch the command to generate the code
+relative to this type in the `giphy-operator` dir:
+```shell
+operator-sdk generate k8s
+```
 
 ## Modify the controller to adapt Pod creation
 

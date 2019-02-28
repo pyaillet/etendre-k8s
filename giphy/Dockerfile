@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 go build .
 FROM golang:1.11
 
 COPY --from=builder server /server
-COPY template.html /
+COPY template.html favicon.ico /
 
 WORKDIR /
 

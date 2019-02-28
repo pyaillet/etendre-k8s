@@ -43,7 +43,7 @@ type AppGiphySpec struct {
 Insert this line after the previous ones to specify the tag used for this
 particular AppGiphy:
 ```go
-  Tag string
+  Tag string `json:"tag"`
 ```
 
 As stated in the code comment, launch the command to generate the code
@@ -76,6 +76,11 @@ The content should then, be like:
 				{
 					Name:    "giphyserver",
 					Image:   "pyaillet/giphyserver:0.1",
+					Env: []corev1.EnvVar{
+					{
+						Name: "TAG",
+						Value: cr.Spec.Tag,
+					},
 				},
 			},
 ```

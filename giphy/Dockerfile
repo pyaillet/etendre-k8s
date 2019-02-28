@@ -6,10 +6,12 @@ COPY main.go /
 RUN go mod init server
 RUN CGO_ENABLED=0 go build .
 
-FROM scratch
+FROM golang:1.11
 
 COPY --from=builder server /server
-COPY template.html cat.gif /
+COPY template.html favicon.ico /
+
+WORKDIR /
 
 ENTRYPOINT [ "/server" ]
 EXPOSE 8080

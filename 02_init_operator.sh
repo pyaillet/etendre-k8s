@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 # Create a new giphy-operator project
 operator-sdk new giphy-operator
 cd giphy-operator

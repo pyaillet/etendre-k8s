@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -16,18 +18,43 @@ type Gif struct {
 	Tag   string
 }
 
+// GiphyResponse holds response data from Giphy
+type GiphyResponse struct {
+	Data GiphyData
+}
+
+// GiphyData holds response info from Giphy
+// Only used parts are extracted
+type GiphyData struct {
+	ImageOriginalURL string `json:"image_original_url"`
+	Title            string
+}
+
+const host = "api.giphy.com"
+const urlTemplate = "https://%1s/v1/gifs/random?api_key=%2s&tag=%3s&rating=G"
+
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-func getGif(tag string, key string) Gif {
-	img, err := ioutil.ReadFile("./cat.gif")
+func getGif(tag string, key string) *Gif {
+	u := fmt.Sprintf(urlTemplate, host, key, tag)
+	var giphyResp GiphyResponse
+	resp, err := http.Get(u)
 	check(err)
+	rawResp, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("%s\n", rawResp)
+	resp.Body.Close()
+	json.Unmarshal([]byte(rawResp), &giphyResp)
+	gifResp, err := http.Get(giphyResp.Data.ImageOriginalURL)
+	check(err)
+	img, err := ioutil.ReadAll(gifResp.Body)
+	check(err)
+	gifResp.Body.Close()
 	b64 := base64.StdEncoding.EncodeToString(img)
-	gif := Gif{Title: "cat", Img: b64, Tag: tag}
-	return gif
+	return &Gif{Title: giphyResp.Data.Title, Img: b64, Tag: tag}
 }
 
 func getTemplate() string {
@@ -43,7 +70,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	gif := getGif(tag, key)
 	t, err := template.New("html").Parse(html)
 	check(err)
-	err = t.Execute(w, gif)
+	err = t.Execute(w, *gif)
 	check(err)
 }
 

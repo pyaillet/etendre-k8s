@@ -105,6 +105,13 @@ containers:
     image: pyaillet/giphy-operator:0.1
 ```
 
+- And add the following env var to inject giphy api key:
+
+```yaml
+- name: GIPHY_API_KEY
+  value: $SECRET_API_KEY
+```
+
 - Deploy the _Operator_ and other needed resources
 
 ```shell

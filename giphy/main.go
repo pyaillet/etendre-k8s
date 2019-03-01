@@ -73,7 +73,7 @@ func getTemplate() string {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	tag := os.Getenv("TAG")
-	key := os.Getenv("GIPHY_APIKEY")
+	key := os.Getenv("GIPHY_API_KEY")
 	log.Printf("Received query for tag %s", tag)
 	html := getTemplate()
 	gif, err := getGif(tag, key)

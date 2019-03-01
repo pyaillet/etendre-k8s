@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -14,7 +13,7 @@ import (
 // A Gif represents a gif base64 encoded img and its title
 type Gif struct {
 	Title string
-	Img   string
+	Src   string
 	Tag   string
 }
 
@@ -51,18 +50,8 @@ func getGif(tag string, key string) (*Gif, error) {
 		return nil, err
 	}
 	resp.Body.Close()
-	json.Unmarshal([]byte(rawResp), &giphyResp)
-	gifResp, err := http.Get(giphyResp.Data.ImageOriginalURL)
-	if err != nil {
-		return nil, err
-	}
-	img, err := ioutil.ReadAll(gifResp.Body)
-	if err != nil {
-		return nil, err
-	}
-	gifResp.Body.Close()
-	b64 := base64.StdEncoding.EncodeToString(img)
-	return &Gif{Title: giphyResp.Data.Title, Img: b64, Tag: tag}, nil
+	err = json.Unmarshal([]byte(rawResp), &giphyResp)
+	return &Gif{Title: giphyResp.Data.Title, Src: giphyResp.Data.ImageOriginalURL, Tag: tag}, nil
 }
 
 func getTemplate() string {

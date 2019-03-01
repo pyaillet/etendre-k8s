@@ -109,7 +109,7 @@ containers:
 
 ```yaml
 - name: GIPHY_API_KEY
-  value: $SECRET_API_KEY
+  value: {{GIPHY_API_KEY}}
 ```
 
 - Deploy the _Operator_ and other needed resources
@@ -117,6 +117,7 @@ containers:
 ```shell
 kubectl apply -f deploy/crds/app_v1alpha1_appgiphy_crd.yaml
 kubectl apply -f deploy/
+sed -e "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml | kubectl apply -f -
 ```
 
 - Verify that the _CRD_ has been created

@@ -66,8 +66,10 @@ Find the lines:
 			},
 ```
 
+- Add the "os" import
 - Replace the `busybox` name with `giphyserver`
 - Replace the `busybox` image with `pyaillet/giphyserver:0.1`
+- Add environment variable declarations
 - Remove the `Command` section
 
 The content should then, be like:
@@ -80,6 +82,10 @@ The content should then, be like:
 					  {
 						  Name: "TAG",
 						  Value: cr.Spec.Tag,
+            },
+					  {
+						  Name: "GIPHY_API_KEY",
+						  Value: os.Getenv("GIPHY_API_KEY"),
             },
 					},
 				},

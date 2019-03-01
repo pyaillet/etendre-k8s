@@ -66,8 +66,10 @@ Find the lines:
 			},
 ```
 
+- Add the "os" import
 - Replace the `busybox` name with `giphyserver`
 - Replace the `busybox` image with `pyaillet/giphyserver:0.1`
+- Add environment variable declarations
 - Remove the `Command` section
 
 The content should then, be like:
@@ -80,6 +82,10 @@ The content should then, be like:
 					  {
 						  Name: "TAG",
 						  Value: cr.Spec.Tag,
+            },
+					  {
+						  Name: "GIPHY_API_KEY",
+						  Value: os.Getenv("GIPHY_API_KEY"),
             },
 					},
 				},
@@ -105,11 +111,19 @@ containers:
     image: pyaillet/giphy-operator:0.1
 ```
 
+- And add the following env var to inject giphy api key:
+
+```yaml
+- name: GIPHY_API_KEY
+  value: {{GIPHY_API_KEY}}
+```
+
 - Deploy the _Operator_ and other needed resources
 
 ```shell
 kubectl apply -f deploy/crds/app_v1alpha1_appgiphy_crd.yaml
 kubectl apply -f deploy/
+sed -e "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml | kubectl apply -f -
 ```
 
 - Verify that the _CRD_ has been created

@@ -77,7 +77,7 @@ The content should then, be like:
 			Containers: []corev1.Container{
 				{
 					Name:    "giphyserver",
-					Image:   "pyaillet/giphyserver:0.1",
+					Image:   "pyaillet/giphyserver:0.2",
 					Env: []corev1.EnvVar{
 					  {
 						  Name: "TAG",

@@ -67,6 +67,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	html := getTemplate()
 	gif, err := getGif(tag, key)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusServiceUnavailable)
 		w.Write([]byte("Error, service unavailable"))
 		return

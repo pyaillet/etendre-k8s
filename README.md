@@ -52,44 +52,11 @@ relative to this type in the `giphy-operator` dir:
 operator-sdk generate k8s
 ```
 
-## Modify the controller to adapt Pod creation
+## Modify the controller to adapt resource creation
 
-Edit the file `pkg/controller/appgiphy/appgiphy_controller.go`
-Find the lines:
-```go
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-```
-
-- Add the "os" import
-- Replace the `busybox` name with `giphyserver`
-- Replace the `busybox` image with `pyaillet/giphyserver:0.1`
-- Add environment variable declarations
-- Remove the `Command` section
-
-The content should then, be like:
-```go
-			Containers: []corev1.Container{
-				{
-					Name:    "giphyserver",
-					Image:   "pyaillet/giphyserver:0.2",
-					Env: []corev1.EnvVar{
-					  {
-						  Name: "TAG",
-						  Value: cr.Spec.Tag,
-            },
-					  {
-						  Name: "GIPHY_API_KEY",
-						  Value: os.Getenv("GIPHY_API_KEY"),
-            },
-					},
-				},
-			},
+copy the controller example : 
+```shell
+cp operator-example/appgiphy_controller.go giphy-operator/pkg/controller/appgiphy/appgiphy_controller.go
 ```
 
 ## Rebuild and push the operator

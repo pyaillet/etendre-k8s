@@ -52,44 +52,11 @@ relative to this type in the `giphy-operator` dir:
 operator-sdk generate k8s
 ```
 
-## Modify the controller to adapt Pod creation
+## Modify the controller to adapt resource creation
 
-Edit the file `pkg/controller/appgiphy/appgiphy_controller.go`
-Find the lines:
-```go
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-```
-
-- Add the "os" import
-- Replace the `busybox` name with `giphyserver`
-- Replace the `busybox` image with `pyaillet/giphyserver:0.1`
-- Add environment variable declarations
-- Remove the `Command` section
-
-The content should then, be like:
-```go
-			Containers: []corev1.Container{
-				{
-					Name:    "giphyserver",
-					Image:   "pyaillet/giphyserver:0.2",
-					Env: []corev1.EnvVar{
-					  {
-						  Name: "TAG",
-						  Value: cr.Spec.Tag,
-            },
-					  {
-						  Name: "GIPHY_API_KEY",
-						  Value: os.Getenv("GIPHY_API_KEY"),
-            },
-					},
-				},
-			},
+copy the controller example : 
+```shell
+cp operator-example/appgiphy_controller.go giphy-operator/pkg/controller/appgiphy/appgiphy_controller.go
 ```
 
 ## Rebuild and push the operator
@@ -122,8 +89,20 @@ containers:
 
 ```shell
 kubectl apply -f deploy/crds/app_v1alpha1_appgiphy_crd.yaml
+```
+
+Define the GIPHY_API_KEY:
+```shell
+sed -i "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml
+```
+
+On MacOS do:
+```shell
+sed -i "" "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml
+```
+
+```shell
 kubectl apply -f deploy/
-sed -e "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml | kubectl apply -f -
 ```
 
 - Verify that the _CRD_ has been created
@@ -153,3 +132,11 @@ $ kubectl get po -l app=example-appgiphy
 NAME                   READY     STATUS    RESTARTS   AGE
 example-appgiphy-pod   1/1       Running   0          100s
 ```
+
+Test that's working:
+
+```shell
+$ kubectl port-forward <POD_NAME> 8080
+```
+
+Open your browser to [http://localhost:8080](http://localhost:8080)

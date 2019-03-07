@@ -89,8 +89,20 @@ containers:
 
 ```shell
 kubectl apply -f deploy/crds/app_v1alpha1_appgiphy_crd.yaml
+```
+
+Define the GIPHY_API_KEY:
+```shell
+sed -i "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml
+```
+
+On MacOS do:
+```shell
+sed -i "" "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml
+```
+
+```shell
 kubectl apply -f deploy/
-sed -e "s/{{GIPHY_API_KEY}}/$GIPHY_API_KEY/" deploy/operator.yaml | kubectl apply -f -
 ```
 
 - Verify that the _CRD_ has been created
@@ -120,3 +132,11 @@ $ kubectl get po -l app=example-appgiphy
 NAME                   READY     STATUS    RESTARTS   AGE
 example-appgiphy-pod   1/1       Running   0          100s
 ```
+
+Test that's working:
+
+```shell
+$ kubectl port-forward <POD_NAME> 8080
+```
+
+Open your browser to [http://localhost:8080](http://localhost:8080)
